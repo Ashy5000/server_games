@@ -60,7 +60,6 @@ var Parse = {
           newData[k][key] = valueVar;
         }
       }
-      console.log(player, key, value);
       Parse.post(JSON.stringify(newData));
     });
   },
@@ -68,12 +67,9 @@ var Parse = {
     var callback = resultCallback;
     var name = requestedPlayer;
     Parse.get(function(data) {
-      console.log("Hi!");
       var jsonParsedData = JSON.parse(data);
       for(var i = 0; i < jsonParsedData.length; i++) {
-        console.log(typeof name);
         if(jsonParsedData[i].name === name) {
-          console.log("Hihihi!");
           callback(jsonParsedData[i]);
         }
       }
@@ -121,12 +117,16 @@ checkForRequestsBtn.on("click", function() {
     for(var i = 0; i < parsedData.length; i++) {
       if(parsedData[i].name === playerName) {
         info = parsedData[i];
-        console.log(info);
       }
     }
     if(info.opponent !== "") {
       if(confirm(`Would you like to play against ${info.opponent}?`)) {
         Parse.put(playerName, "confirmed", true);
+        Parse.getPlayer(playerName, function(data) {
+          Parse.getPlayer(data.opponent, function(opponentData) {
+            runGame(data, opponentData);
+          });
+        });
       }
     }
   });
@@ -143,6 +143,9 @@ checkForResponsesBtn.on("click", function() {
   Parse.getPlayer(opponentName, function(opponentData) {
     if(opponentData.confirmed === true) {
       if(confirm("Launch game with " + opponentName + "?")) {
+        Parse.getPlayer(playerName, function(yourPlayer) {
+          runGame(yourPlayer, opponentData);
+        });
       }
     } else {
       alert("Either declined or still waiting...");
@@ -177,7 +180,6 @@ function addPlayerListItem(player, position, playerData) {
       var dataCopy = JSON.parse(data);
       dataCopy[i].opponent = playerName;
       opponentName = dataCopy[i].name;
-      console.log(dataCopy);
       Parse.post(JSON.stringify(dataCopy), reloadPlayers);
     });
   });

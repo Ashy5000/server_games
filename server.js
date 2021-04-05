@@ -26,26 +26,3 @@ http.createServer(function(req, res) {
     });
   }
 }).listen(8080, "127.0.0.1");
-// else if(req.method === "DELETE") {
-//   console.log("DELETE request recived.");
-//   var dataChunks = [];
-//   req.on("data", function(chunk) {
-//     dataChunks.push(chunk);
-//   });
-//   req.on("end", function() {
-//     var completedChunks = Buffer.concat(dataChunks);
-//     fs.readFile("data.txt", function(err, data) {
-//       if(err) {
-//         console.log(err);
-//         res.writeHead(404, headers);
-//         res.end();
-//       }
-//       res.writeHead(200, headers);
-//       var parsedFile = JSON.parse(data);
-//       delete parsedFile[completedChunks];
-//       fs.writeFile("data.txt", JSON.stringify(parsedFile), function() {
-//         console.log("File written with contents", JSON.stringify(parsedFile));
-//       });
-//     })
-//   })
-// }
