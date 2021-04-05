@@ -64,13 +64,16 @@ var Parse = {
       Parse.post(JSON.stringify(newData));
     });
   },
-  getPlayer: function(player, resultCallback) {
-    var result = undefined;
+  getPlayer: function(requestedPlayer, resultCallback) {
     var callback = resultCallback;
+    var name = requestedPlayer;
     Parse.get(function(data) {
+      console.log("Hi!");
       var jsonParsedData = JSON.parse(data);
       for(var i = 0; i < jsonParsedData.length; i++) {
-        if(jsonParsedData[i].name === player) {
+        console.log(typeof name);
+        if(jsonParsedData[i].name === name) {
+          console.log("Hihihi!");
           callback(jsonParsedData[i]);
         }
       }
@@ -87,6 +90,7 @@ var exitGameButton = $("<button>Exit game</button>");
 var checkForResponsesBtn = $("<button>Check for responses</button>");
 var $app = $("<div></div>");
 var playerName = "";
+var opponentName = "";
 submitButton.on('click', function() {
   var info = new Player(nameInput.val());
   playerName = info.name;
@@ -136,14 +140,15 @@ exitGameButton.on("click", function() {
   }
 });
 checkForResponsesBtn.on("click", function() {
-  Parse.getPlayer(playerName, function(player) {
-    Parse.getPlayer(player.opponent, function(yourOpponent) {
-      if(yourOpponent.confirmed) {
-        console.log("yay");
+  Parse.getPlayer(opponentName, function(opponentData) {
+    if(opponentData.confirmed === true) {
+      if(confirm("Launch game with " + opponentName + "?")) {
       }
-    });
+    } else {
+      alert("Either declined or still waiting...");
+    }
   });
-})
+});
 console.log("Client is running.");
 function reloadPlayers() {
   var playerData = undefined;
@@ -171,6 +176,7 @@ function addPlayerListItem(player, position, playerData) {
     Parse.get(function(data) {
       var dataCopy = JSON.parse(data);
       dataCopy[i].opponent = playerName;
+      opponentName = dataCopy[i].name;
       console.log(dataCopy);
       Parse.post(JSON.stringify(dataCopy), reloadPlayers);
     });
